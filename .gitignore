@@ -1,0 +1,112 @@
+# Haskell build artifacts
+dist/
+dist-*/
+cabal-dev/
+.cabal-sandbox/
+cabal.sandbox.config
+.stack-work/
+stack.yaml.lock
+
+# GHC generated files
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+*.prof
+*.aux
+*.hp
+*.eventlog
+.virtualenv
+
+# Cabal build outputs
+cabal.project.local
+cabal.project.local~
+.ghc.environment.*
+
+# Stack build outputs
+.stack-work/
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Haskell Language Server
+.hie/
+hie.yaml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Log files
+*.log
+logs/
+
+# Database files (if using SQLite)
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated documentation
+docs/_build/
+.doctrees/
+
+# Package manager files
+node_modules/ # if using any npm packages
+package-lock.json
+yarn.lock
+
+# Backup files
+*.bak
+*.backup
+
+# Editor specific
+.emacs.desktop
+.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Tags
+tags
+TAGS
+
+# Binary executables (adjust name as needed)
+todo-api
+*.exe
+
+# Test coverage
+.hpc/
+tix/
+
+# Profiling
+*.prof.html
