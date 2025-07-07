@@ -3,32 +3,36 @@
 module Main where
 
 import Configuration.Dotenv (defaultConfig, loadFile)
-import Control.Monad.IO.Class (liftIO)
+import Control.Exception (try)
+import Core (ValidationError (..))
 import Core qualified
-import Response (ResponseDTO(..))
-import Network.HTTP.Types.Status (noContent204, notFound404, created201)
+import Network.HTTP.Types.Status
+import Response (ResponseDTO (..))
 import Types (NewTodo (..))
 import Web.Scotty
 
 main :: IO ()
 main = do
-  -- Load environment variables from .env file
   loadFile defaultConfig
 
   scotty 3000 $ do
-    get "/" $ do
+    get "/" $
       text "Todo API!!!"
 
     post "/todos" $ do
       NewTodo {title = t} <- jsonData
-      todo <- liftIO $ Core.createTodo t
-      status created201
-      json $ ResponseDTO { message = "Todo created", data_ = todo }
+      result <- liftIO $ try (Core.createTodo t)
+      case result of
+        Left (ValidationError msg) -> do
+          status badRequest400
+          json $ ResponseDTO {message = msg, data_ = ()}
+        Right todo -> do
+          status created201
+          json $ ResponseDTO {message = "Todo created", data_ = todo}
 
     get "/todos" $ do
       todos <- liftIO Core.listTodos
-      liftIO $ putStrLn "Here"
-      json $ ResponseDTO { message = "Todos fetched", data_ = todos }
+      json $ ResponseDTO {message = "Todo fetched", data_ = todos}
 
     get "/todos/:id" $ do
       tid <- pathParam "id"
@@ -36,18 +40,23 @@ main = do
       case mtodo of
         Nothing -> do
           status notFound404
-          json $ ResponseDTO { message = "Todo not found", data_ = () }
-        Just todo -> json $ ResponseDTO { message = "Todo fetched", data_ = todo }
+          json $ ResponseDTO {message = "Todo not found", data_ = ()}
+        Just todo ->
+          json $ ResponseDTO {message = "Todo fetched", data_ = todo}
 
     patch "/todos/:id" $ do
       tid <- pathParam "id"
-      NewTodo {title} <- jsonData
-      mtodo <- liftIO $ Core.updateTodo (tid, title)
-      case mtodo of
-        Nothing -> do
+      NewTodo {title = t} <- jsonData
+      result <- liftIO $ try (Core.updateTodo (tid, t))
+      case result of
+        Left (ValidationError msg) -> do
+          status badRequest400
+          json $ ResponseDTO {message = msg, data_ = ()}
+        Right Nothing -> do
           status notFound404
-          json $ ResponseDTO { message = "Todo not found", data_ = () }
-        Just todo -> json $ ResponseDTO { message = "Todo updated", data_ = todo }
+          json $ ResponseDTO {message = "Todo not found", data_ = ()}
+        Right (Just todo) ->
+          json $ ResponseDTO {message = "Todo updated", data_ = todo}
 
     patch "/todos/:id/complete" $ do
       tid <- pathParam "id"
@@ -55,8 +64,8 @@ main = do
       case mtodo of
         Nothing -> do
           status notFound404
-          json $ ResponseDTO { message = "Todo not found", data_ = () }
-        Just todo -> json $ ResponseDTO { message = "Todo marked as complete", data_ = todo }
+          json $ ResponseDTO {message = "Todo not found", data_ = ()}
+        Just todo -> json $ ResponseDTO {message = "Todo marked as complete", data_ = todo}
 
     delete "/todos/:id" $ do
       tid <- pathParam "id"
@@ -64,7 +73,7 @@ main = do
       if ok
         then do
           status noContent204
-          json $ ResponseDTO { message = "Todo deleted", data_ = () }
+          json $ ResponseDTO {message = "Todo deleted", data_ = ()}
         else do
           status notFound404
-          json $ ResponseDTO { message = "Todo not found", data_ = () }
+          json $ ResponseDTO {message = "Todo not found", data_ = ()}
