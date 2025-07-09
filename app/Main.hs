@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- Main.hs
 module Main where
 
 import Configuration.Dotenv (defaultConfig, loadFile)
 import Control.Exception (try)
 import Core (ValidationError (..))
 import Core qualified
+import HTMXRoutes qualified
 import Network.HTTP.Types.Status
 import Response (ResponseDTO (..))
 import Types (NewTodo (..))
@@ -16,6 +18,7 @@ main = do
   loadFile defaultConfig
 
   scotty 3000 $ do
+    -- Original API endpoints
     get "/" $
       text "Todo API!!!"
 
@@ -77,3 +80,6 @@ main = do
         else do
           status notFound404
           json $ ResponseDTO {message = "Todo not found", data_ = ()}
+
+    -- Add HTMX routes
+    HTMXRoutes.addHTMXRoutes

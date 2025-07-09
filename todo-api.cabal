@@ -63,6 +63,8 @@ library
                     , Types
                     , Database
                     , Response
+                    , HTMXViews
+                    , HTMXRoutes
                       
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -80,6 +82,9 @@ library
                     , bytestring
                     , containers
                     , dotenv
+                    , blaze-html
+                    , scotty
+                    , http-types
 
     -- Directories containing source files.
     hs-source-dirs:   src
